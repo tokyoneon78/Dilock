@@ -10,7 +10,7 @@ pub trait EntryManager {
     }
 }
 
-struct DefaultManager;
+pub struct DefaultManager;
 
 impl DefaultManager {
     pub fn new() -> Self {
@@ -20,18 +20,19 @@ impl DefaultManager {
 
 impl EntryManager for DefaultManager {}
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Entry {
     Site(SiteEntry),
     Wallet(WalletEntry),
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default, Clone)]
 pub struct SiteEntry {
     pub user_name: String,
     pub password: String,
     pub url: String,
 }
-#[derive(Debug, PartialEq)]
+
+#[derive(Debug, PartialEq, Default, Clone)]
 pub struct WalletEntry {
     pub phrase: String,
     /// e.g metamask
@@ -68,6 +69,27 @@ impl EncryptedEntry for SiteEntry {
     }
 }
 
+impl EncryptedEntry for WalletEntry {
+    fn encrypt(&self, secret: &str) -> String {
+        let mut encrypted_phrase = self.phrase.clone();
+        let mut encrypted_name = self.name.clone();
+
+        encrypted_phrase.push_str(secret);
+        encrypted_name.push_str(secret);
+        encrypted_phrase
+    }
+
+    fn decrypt(&self, secret: &str) -> Self {
+        let decrypted_phrase = self.phrase.clone();
+        let decrypted_name = self.name.clone();
+
+        WalletEntry {
+            phrase: decrypted_phrase,
+            name: decrypted_name,
+        }
+    }
+}
+
 /// Tests
 #[cfg(test)]
 mod tests {
@@ -91,4 +113,27 @@ mod tests {
         });
         assert_eq!(*entry, found_entry);
     }
+
+    #[test]
+    fn test_entry_manager_id_from_entry() {
+        let entry_manager = DefaultManager::new();
+        let site_entry = Entry::Site(SiteEntry {
+            user_name: "simdi".to_string(),
+            password: "123".to_string(),
+            url: "www.google.com".to_string(),
+        });
+
+        let site_entry_id = entry_manager.id_from_entry(&site_entry);
+        assert_eq!(site_entry_id, "simdi|www.google.com");
+
+        let wallet_entry = Entry::Wallet(WalletEntry {
+            phrase: "testphrase".to_string(),
+            name: "metamask1".to_string(),
+        });
+
+        let wallet_entry_id = entry_manager.id_from_entry(&wallet_entry);
+        assert_eq!(wallet_entry_id, "metamask1");
+    }
+
+  
 }
