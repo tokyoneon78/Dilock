@@ -3,13 +3,6 @@
 version = 3
 
 [[package]]
-name = "Dilock"
-version = "0.1.0"
-dependencies = [
- "rust-argon2",
-]
-
-[[package]]
 name = "arrayref"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -58,6 +51,13 @@ checksum = "0bf124c720b7686e3c2663cf54062ab0f68a88af2fb6a030e87e30bf721fcb38"
 dependencies = [
  "cfg-if",
  "lazy_static",
+]
+
+[[package]]
+name = "dilock"
+version = "0.1.0"
+dependencies = [
+ "rust-argon2",
 ]
 
 [[package]]
