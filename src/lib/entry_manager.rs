@@ -4,7 +4,6 @@ pub trait EntryManager {
     fn get_entry(&self, name: &str) -> Option<&Entry> {
         None
     }
-
     fn id_from_entry(&self, entry: &Entry) -> &str {
         ""
     }
